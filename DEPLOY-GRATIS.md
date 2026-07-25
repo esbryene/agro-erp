@@ -39,7 +39,7 @@ Guarde essas 3 informações (connection string, Project URL, service_role key) 
    - **Root Directory**: `backend`
    - **Runtime**: Node
    - **Build Command**: `npm install`
-   - **Start Command**: `node src/migrate.js && node src/index.js`
+   - **Start Command**: `node src/migrate.js && node src/seed.js && node src/index.js`
    - **Plan**: Free
 5. Em **"Environment Variables"**, adicione:
    - `DATABASE_URL` → a connection string do Supabase (Parte 1, passo 5)
@@ -47,6 +47,12 @@ Guarde essas 3 informações (connection string, Project URL, service_role key) 
    - `SUPABASE_SERVICE_KEY` → a service_role key (Parte 1, passo 6)
    - `SUPABASE_BUCKET` → `anexos`
    - `JWT_SECRET` → qualquer frase longa e aleatória (ex: `um-segredo-bem-grande-e-dificil-de-adivinhar-123`)
+   - `SEED_ADMIN_EMAIL` → o e-mail que você quer usar para entrar no sistema
+   - `SEED_ADMIN_PASSWORD` → a senha que você quer usar (escolha uma forte)
+
+   ⚠️ Os dois últimos são importantes: se você não definir, o sistema sobe com
+   e-mail e senha padrão que estão escritos no código — ou seja, qualquer pessoa
+   que veja o projeto conseguiria entrar no seu financeiro.
 6. Clique em **"Create Web Service"**
 
 Espere o deploy terminar (alguns minutos). No topo da página vai aparecer o endereço do backend, tipo:
@@ -72,18 +78,23 @@ Espere terminar. Vai aparecer o link do site, tipo `https://algumnome123.netlify
 
 ---
 
-## Depois de publicar: criar o usuário administrador
+## Depois de publicar: entrar no sistema
 
-O sistema não vem com login pronto — precisa criar o primeiro usuário (admin) manualmente, uma única vez.
+O usuário administrador é criado **sozinho**, na primeira vez que o backend sobe
+no Render (faz parte do Start Command). Você não precisa rodar nenhum comando.
 
-1. No painel do **Render**, abra seu serviço → aba **"Shell"**
-2. Digite o comando:
-   ```
-   node src/seed.js
-   ```
-3. Ele vai mostrar na tela o e-mail e a senha temporária do administrador
-4. Entre no site publicado (Netlify) e faça login com esses dados
-5. Troque a senha assim que entrar (em Usuários & permissões → editar seu usuário)
+Entre no site publicado (Netlify) com o e-mail e a senha que você definiu nas
+variáveis `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` (Parte 2, passo 5).
+
+Se você não definiu essas duas variáveis, o login padrão é
+`admin@agrorealpets.com.br` / `TrocarSenha123!` — nesse caso **troque a senha
+imediatamente** em Usuários & permissões → editar seu usuário, porque essa senha
+é pública.
+
+> Por que não é manual: a aba "Shell" do Render, usada para rodar comandos à mão,
+> só existe nos planos pagos. Por isso a criação inicial roda junto com o start.
+> Ela é segura de repetir: não duplica usuário, não reseta sua senha e não
+> desfaz as permissões que você personalizar nas telas do sistema.
 
 ---
 

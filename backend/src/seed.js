@@ -62,18 +62,26 @@ const PERMISSIONS = {
 async function seed() {
   const client = await pool.connect();
   try {
-    console.log("[seed] gravando matriz de permissões...");
-    for (const [role, perms] of Object.entries(PERMISSIONS)) {
-      for (const moduleKey of MODULES) {
-        const [view, edit, del] = perms[moduleKey] || [false, false, false];
-        await client.query(
-          `INSERT INTO role_permissions (role, module_key, can_view, can_edit, can_delete)
-           VALUES ($1, $2, $3, $4, $5)
-           ON CONFLICT (role, module_key)
-           DO UPDATE SET can_view = $3, can_edit = $4, can_delete = $5`,
-          [role, moduleKey, view, edit, del]
-        );
+    // Só grava a matriz na primeira vez. O seed roda a cada boot no Render
+    // (free tier não tem Shell), e reescrever aqui apagaria as permissões
+    // ajustadas na tela "Usuários & permissões" a cada vez que o serviço acorda.
+    const { rows: permCount } = await client.query("SELECT COUNT(*)::int AS n FROM role_permissions");
+    if (permCount[0].n === 0) {
+      console.log("[seed] gravando matriz de permissões...");
+      for (const [role, perms] of Object.entries(PERMISSIONS)) {
+        for (const moduleKey of MODULES) {
+          const [view, edit, del] = perms[moduleKey] || [false, false, false];
+          await client.query(
+            `INSERT INTO role_permissions (role, module_key, can_view, can_edit, can_delete)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (role, module_key)
+             DO UPDATE SET can_view = $3, can_edit = $4, can_delete = $5`,
+            [role, moduleKey, view, edit, del]
+          );
+        }
       }
+    } else {
+      console.log("[seed] matriz de permissões já existe, preservando as personalizações.");
     }
 
     const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@agrorealpets.com.br";

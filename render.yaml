@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: npm install
-    startCommand: node src/migrate.js && node src/index.js
+    startCommand: node src/migrate.js && node src/seed.js && node src/index.js
     envVars:
       - key: DATABASE_URL
         sync: false
@@ -17,3 +17,10 @@ services:
         sync: false
       - key: SUPABASE_BUCKET
         value: anexos
+      # Login do primeiro administrador. Defina os dois no painel do Render:
+      # sem isso o sistema sobe com e-mail e senha padrão, que são públicos
+      # (estão no código) e qualquer um poderia usar para entrar.
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
