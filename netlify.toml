@@ -1,7 +1,7 @@
 [build]
   base = "frontend"
   command = "npm install && npm run build"
-  publish = "frontend/dist"
+  publish = "dist"
 
 # Redireciona todas as rotas para o index.html (necessário para SPA / React Router)
 [[redirects]]
