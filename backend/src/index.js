@@ -54,9 +54,16 @@ const PORT = process.env.PORT || 4000;
 // processos separados: cada "node xxx.js" abriria uma conexão nova contra o
 // pooler do Supabase, e reconexões rápidas em sequência travavam sem erro
 // (pool.connect() não tem timeout padrão).
+process.on("uncaughtException", (err) => console.error("[boot] uncaughtException:", err));
+process.on("unhandledRejection", (err) => console.error("[boot] unhandledRejection:", err));
+process.on("exit", (code) => console.log(`[boot] processo encerrando, code=${code}`));
+
 (async () => {
+  console.log("[boot] iniciando migrate...");
   await require("./migrate").run();
+  console.log("[boot] migrate ok, iniciando seed...");
   await require("./seed").seed();
+  console.log("[boot] seed ok, subindo servidor...");
   app.listen(PORT, () => {
     console.log(`[agro-erp] backend ouvindo na porta ${PORT}`);
   });
