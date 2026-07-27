@@ -58,7 +58,16 @@ process.on("uncaughtException", (err) => console.error("[boot] uncaughtException
 process.on("unhandledRejection", (err) => console.error("[boot] unhandledRejection:", err));
 process.on("exit", (code) => console.log(`[boot] processo encerrando, code=${code}`));
 
-console.log(`[boot] PORT=${PORT} subindo servidor sem migrate/seed (teste de diagnóstico)...`);
-app.listen(PORT, () => {
-  console.log(`[agro-erp] backend ouvindo na porta ${PORT}`);
+process.on("uncaughtException", (err) => console.error("[boot] uncaughtException:", err));
+process.on("unhandledRejection", (err) => console.error("[boot] unhandledRejection:", err));
+
+(async () => {
+  await require("./migrate").run();
+  await require("./seed").seed();
+  app.listen(PORT, () => {
+    console.log(`[agro-erp] backend ouvindo na porta ${PORT}`);
+  });
+})().catch((err) => {
+  console.error("[boot] falhou:", err);
+  process.exit(1);
 });
