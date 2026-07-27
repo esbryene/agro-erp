@@ -1,0 +1,10 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd backend && npm install"
+
+[deploy]
+startCommand = "cd backend && node src/migrate.js && node src/seed.js && node src/index.js"
+restartPolicyMaxRetries = 5
+
+[[services]]
+name = "agro-erp-backend"
