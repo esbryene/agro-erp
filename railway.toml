@@ -1,6 +1,0 @@
-[build]
-dockerfile = "backend/Dockerfile"
-
-[[services]]
-name = "agro-erp-backend"
-healthcheckPath = "/api/health"
