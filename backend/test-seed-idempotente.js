@@ -31,21 +31,21 @@ require.cache[dbPath] = {
   exports: { pool: { connect: async () => client, end: async () => {} } },
 };
 
-require("./src/seed.js");
+require("./src/seed.js")
+  .seed()
+  .then(() => {
+    const tocouPermissoes = executadas.some((s) => /INSERT INTO role_permissions/.test(s));
+    const criouAdmin = executadas.some((s) => /INSERT INTO users/.test(s));
+    const criouBancos = executadas.some((s) => /INSERT INTO bank_accounts/.test(s));
 
-process.on("exit", () => {
-  const tocouPermissoes = executadas.some((s) => /INSERT INTO role_permissions/.test(s));
-  const criouAdmin = executadas.some((s) => /INSERT INTO users/.test(s));
-  const criouBancos = executadas.some((s) => /INSERT INTO bank_accounts/.test(s));
-
-  if (cheio) {
-    assert.strictEqual(tocouPermissoes, false, "reescreveu permissões já existentes — apagaria as personalizações");
-    assert.strictEqual(criouAdmin, false, "tentou recriar o admin");
-    assert.strictEqual(criouBancos, false, "duplicou os bancos");
-    console.log("OK: boots seguintes não desfazem nada.");
-  } else {
-    assert.strictEqual(tocouPermissoes, true, "primeiro boot não criou as permissões");
-    assert.strictEqual(criouAdmin, true, "primeiro boot não criou o admin");
-    console.log("OK: primeiro boot cria admin, permissões e bancos.");
-  }
-});
+    if (cheio) {
+      assert.strictEqual(tocouPermissoes, false, "reescreveu permissões já existentes — apagaria as personalizações");
+      assert.strictEqual(criouAdmin, false, "tentou recriar o admin");
+      assert.strictEqual(criouBancos, false, "duplicou os bancos");
+      console.log("OK: boots seguintes não desfazem nada.");
+    } else {
+      assert.strictEqual(tocouPermissoes, true, "primeiro boot não criou as permissões");
+      assert.strictEqual(criouAdmin, true, "primeiro boot não criou o admin");
+      console.log("OK: primeiro boot cria admin, permissões e bancos.");
+    }
+  });

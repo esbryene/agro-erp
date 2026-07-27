@@ -49,6 +49,18 @@ app.use((err, req, res, next) => {
 app.use((req, res) => res.status(404).json({ error: "Rota não encontrada." }));
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`[agro-erp] backend ouvindo na porta ${PORT}`);
+
+// Migração e seed rodam aqui (mesmo processo/pool do servidor) em vez de
+// processos separados: cada "node xxx.js" abriria uma conexão nova contra o
+// pooler do Supabase, e reconexões rápidas em sequência travavam sem erro
+// (pool.connect() não tem timeout padrão).
+(async () => {
+  await require("./migrate").run();
+  await require("./seed").seed();
+  app.listen(PORT, () => {
+    console.log(`[agro-erp] backend ouvindo na porta ${PORT}`);
+  });
+})().catch((err) => {
+  console.error("[boot] falhou:", err);
+  process.exit(1);
 });

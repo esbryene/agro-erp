@@ -123,13 +123,16 @@ async function seed() {
     console.log("[seed] concluído.");
   } finally {
     client.release();
-    await pool.end();
   }
 }
 
-seed()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error("[seed] falhou:", err);
-    process.exit(1);
-  });
+module.exports = { seed };
+
+if (require.main === module) {
+  seed()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error("[seed] falhou:", err);
+      process.exit(1);
+    });
+}

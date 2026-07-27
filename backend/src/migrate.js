@@ -45,13 +45,16 @@ async function run() {
     }
   } finally {
     client.release();
-    await pool.end();
   }
 }
 
-run()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error("[migrate] falhou:", err);
-    process.exit(1);
-  });
+module.exports = { run };
+
+if (require.main === module) {
+  run()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error("[migrate] falhou:", err);
+      process.exit(1);
+    });
+}
